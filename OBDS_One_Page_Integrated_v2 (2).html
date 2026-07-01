@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#090b0a" />
+<title>OBDS One Page Integrated System Map</title>
+<style>
+:root{
+  --bg:#080a09;--panel:#101410;--panel2:#0d110e;--ink:#f4f6ef;--muted:#8e978d;--line:rgba(255,255,255,.12);
+  --lime:#e6ff45;--green:#74d69e;--blue:#6da8ff;--orange:#ff9b73;--gold:#e5bd56;--red:#ef766f;--gray:#8d98a8;
+  --shadow:0 18px 48px rgba(0,0,0,.42);--radius:16px;
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{background-image:radial-gradient(circle at 72% 12%,rgba(230,255,69,.06),transparent 28%),linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:auto,28px 28px,28px 28px}
+button{font:inherit}.shell{max-width:1760px;margin:auto;padding:18px}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:12px}.eyebrow{font:700 10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.15em;text-transform:uppercase;color:var(--lime);margin-bottom:6px}.title{font-size:clamp(22px,3vw,42px);line-height:1;letter-spacing:-.045em;margin:0}.title em{font-style:normal;color:var(--lime)}.sub{margin:8px 0 0;color:var(--muted);font-size:12px;max-width:900px;line-height:1.5}
+.actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}.filter,.icon{border:1px solid var(--line);background:rgba(255,255,255,.035);color:#b9c1b8;border-radius:10px;padding:8px 11px;font-size:10px;font-weight:750;letter-spacing:.04em;cursor:pointer;transition:.2s}.filter:hover,.icon:hover{border-color:rgba(230,255,69,.45);color:white}.filter.active{background:var(--lime);border-color:var(--lime);color:#11140a}.icon{width:36px;height:36px;padding:0;font-size:15px}
+.viewport{border:1px solid var(--line);border-radius:20px;background:rgba(8,11,9,.86);box-shadow:var(--shadow);overflow:auto;position:relative}.canvas{position:relative;width:1600px;height:1045px;transform-origin:0 0;transition:transform .2s ease}
+.canvas::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 52% 40%,rgba(230,255,69,.035),transparent 23%),linear-gradient(90deg,transparent 0 17.5%,rgba(255,255,255,.035) 17.6% 17.7%,transparent 17.8% 36%,rgba(255,255,255,.035) 36.1% 36.2%,transparent 36.3% 64%,rgba(255,255,255,.035) 64.1% 64.2%,transparent 64.3%)}
+svg.links{position:absolute;inset:0;width:1600px;height:1045px;z-index:1;pointer-events:none}.edge{fill:none;stroke:#2e362f;stroke-width:2}.flow{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-dasharray:2 13;animation:dash 1.8s linear infinite;filter:drop-shadow(0 0 4px currentColor)}@keyframes dash{to{stroke-dashoffset:-30}}.dot{filter:drop-shadow(0 0 6px currentColor)}
+.lane-label{position:absolute;z-index:2;font:800 9px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.13em;text-transform:uppercase;color:#657066;display:flex;align-items:center;gap:8px}.lane-label::after{content:"";width:110px;height:1px;background:rgba(255,255,255,.08)}
+.card{position:absolute;z-index:3;border:1px solid var(--line);border-top:4px solid var(--c,var(--gray));border-radius:var(--radius);background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018));box-shadow:0 14px 35px rgba(0,0,0,.28);padding:14px 15px;cursor:pointer;transition:.22s;overflow:hidden}.card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--c) 60%,var(--line));box-shadow:0 20px 45px rgba(0,0,0,.42),0 0 0 1px color-mix(in srgb,var(--c) 20%,transparent)}.card:focus-visible{outline:2px solid var(--lime);outline-offset:2px}.card small{display:block;font:700 8.5px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--c);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}.card b{display:block;font-size:14px;line-height:1.16}.card p{margin:6px 0 0;color:var(--muted);font-size:10px;line-height:1.45}.card .plus{position:absolute;right:10px;top:8px;color:var(--c);font:14px ui-monospace;opacity:.7}.card .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.chip{font:8px ui-monospace,monospace;padding:4px 6px;border:1px solid rgba(255,255,255,.1);border-radius:999px;color:#aab2a8;background:rgba(255,255,255,.025)}
+.story{min-height:94px}.story b{font-size:15px}.story.current{--c:var(--orange)}.story.foundation{--c:var(--blue)}.story.gap{--c:var(--gold)}.story.intent{--c:var(--lime)}.story.outcome{--c:var(--green)}
+.source{--c:var(--green)}.platform{--c:var(--blue)}.core{--c:var(--orange)}.knowledge{--c:var(--gold)}.ai{--c:var(--red)}.process{--c:var(--orange)}.governance{--c:var(--gold)}.output{--c:var(--green)}.neutral{--c:var(--gray)}
+.cluster{position:absolute;z-index:2;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(255,255,255,.018);padding:14px}.cluster-title{font:800 9px ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:#6f786e;margin-bottom:8px}.cluster-title b{color:var(--c,var(--lime))}
+.obds-core{position:absolute;z-index:3;left:570px;top:226px;width:430px;height:392px;border:1px solid rgba(255,155,115,.32);border-radius:22px;background:linear-gradient(180deg,rgba(255,155,115,.06),rgba(255,255,255,.018));box-shadow:0 25px 70px rgba(0,0,0,.35);padding:16px 16px 14px 58px}.obds-core::before{content:"GOVERNANCE · SECURITY · QUALITY · RISK";position:absolute;left:12px;top:14px;bottom:14px;width:30px;border:1px solid rgba(229,189,86,.32);border-radius:12px;background:rgba(229,189,86,.055);color:var(--gold);font:800 8px ui-monospace,monospace;letter-spacing:.08em;writing-mode:vertical-rl;transform:rotate(180deg);display:flex;align-items:center;justify-content:center;padding:8px}.core-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.core-head b{font-size:19px}.core-head span{font:9px ui-monospace;color:var(--orange);border:1px solid rgba(255,155,115,.25);padding:5px 7px;border-radius:999px}.layer{height:60px;border:1px solid rgba(255,255,255,.1);border-left:4px solid var(--lc);border-radius:12px;background:rgba(255,255,255,.025);padding:9px 12px;margin-top:7px;cursor:pointer;transition:.2s;display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center}.layer:hover{transform:translateX(4px);background:rgba(255,255,255,.045)}.layer b{font-size:11.5px}.layer span{font-size:9.5px;color:var(--muted);line-height:1.35}
+.pathway{position:absolute;z-index:2;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:rgba(255,255,255,.016);padding:12px}.pathway h3{margin:0;font-size:11px;letter-spacing:.03em}.pathway h3 span{font:8px ui-monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-left:6px}.mini{position:absolute;z-index:3;border:1px solid var(--line);border-top:3px solid var(--c);border-radius:12px;background:#0d110e;padding:10px 11px;cursor:pointer;transition:.2s}.mini:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--c) 60%,var(--line))}.mini small{font:700 7.5px ui-monospace;color:var(--c);letter-spacing:.08em;text-transform:uppercase}.mini b{display:block;font-size:11.5px;margin-top:5px;line-height:1.15}.mini span{display:block;font-size:8.5px;color:var(--muted);margin-top:4px;line-height:1.35}
+.outcome-box{position:absolute;z-index:3;width:226px;border:1px solid var(--line);border-left:4px solid var(--c);border-radius:15px;background:rgba(255,255,255,.028);padding:12px 13px;cursor:pointer;transition:.2s}.outcome-box:hover{transform:translateX(4px);border-color:color-mix(in srgb,var(--c) 60%,var(--line))}.outcome-box small{font:700 8px ui-monospace;color:var(--c);text-transform:uppercase;letter-spacing:.09em}.outcome-box b{display:block;font-size:13px;margin-top:5px}.outcome-box p{font-size:9.5px;color:var(--muted);line-height:1.4;margin:6px 0 0}
+.govern-bar{position:absolute;left:40px;top:735px;width:1520px;height:58px;z-index:3;border:1px solid rgba(229,189,86,.28);border-radius:15px;background:linear-gradient(90deg,rgba(229,189,86,.08),rgba(255,255,255,.02));display:grid;grid-template-columns:190px repeat(5,1fr);align-items:center;gap:10px;padding:10px 14px}.govern-bar strong{color:var(--gold);font-size:13px}.govern-bar span{font-size:9.5px;color:#9ca59b;border-left:1px solid rgba(255,255,255,.08);padding-left:12px}.govern-bar b{color:var(--ink)}
+.maturity{position:absolute;left:40px;top:825px;width:1520px;z-index:3}.maturity-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.maturity-head b{font-size:12px}.maturity-head span{font:8.5px ui-monospace;color:#6f786f}.levels{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.level{position:relative;min-height:88px;border:1px solid var(--line);border-top:3px solid var(--lc);border-radius:13px;background:rgba(255,255,255,.025);padding:11px;cursor:pointer;transition:.2s}.level:hover{transform:translateY(-3px)}.level:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:36px;color:#5d665d;z-index:4}.level small{font:700 8px ui-monospace;color:var(--lc)}.level b{display:block;font-size:12px;margin-top:5px}.level span{display:block;color:var(--muted);font-size:8.8px;line-height:1.35;margin-top:4px}.level.target{box-shadow:0 0 0 1px rgba(230,255,69,.35) inset,0 0 30px rgba(230,255,69,.05);background:rgba(230,255,69,.04);animation:target 2.8s ease-in-out infinite}@keyframes target{50%{box-shadow:0 0 0 1px rgba(230,255,69,.6) inset,0 0 35px rgba(230,255,69,.1)}}
+.support{position:absolute;left:40px;top:960px;width:1520px;height:58px;z-index:3;border:1px solid rgba(255,255,255,.1);border-radius:14px;background:rgba(255,255,255,.02);display:grid;grid-template-columns:190px repeat(4,1fr);align-items:center;gap:10px;padding:10px 14px}.support strong{font-size:12px;color:var(--lime)}.support span{font-size:9px;color:var(--muted);border-left:1px solid rgba(255,255,255,.08);padding-left:12px}.support b{color:var(--ink)}
+.dim{opacity:.15!important;filter:saturate(.4)}.focus{opacity:1!important;filter:none!important}.legend{display:flex;gap:13px;flex-wrap:wrap;margin-top:10px;font:9px ui-monospace;color:#677067}.legend span{display:flex;align-items:center;gap:5px}.legend i{width:8px;height:8px;border-radius:2px;background:var(--c)}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:.25s;z-index:90}.scrim.show{opacity:1;pointer-events:auto}.drawer{position:fixed;top:0;right:0;width:min(470px,94vw);height:100%;z-index:100;background:#0d100e;border-left:1px solid var(--line);box-shadow:-25px 0 70px rgba(0,0,0,.55);transform:translateX(103%);transition:transform .32s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}.drawer.show{transform:none}.drawer-head{display:flex;gap:12px;align-items:flex-start;padding:20px;border-bottom:1px solid var(--line)}.drawer-dot{width:12px;height:12px;border-radius:4px;background:var(--dc,var(--lime));margin-top:5px}.drawer-head small{font:9px ui-monospace;color:var(--dc,var(--lime));text-transform:uppercase;letter-spacing:.1em}.drawer-head h3{font-size:22px;line-height:1.12;margin:5px 0 0}.close{margin-left:auto;width:34px;height:34px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:10px;cursor:pointer}.close:hover{border-color:var(--red);color:var(--red)}.drawer-body{padding:20px;overflow:auto;color:#aab2a9;font-size:13px;line-height:1.65}.drawer-body h4{color:var(--ink);font-size:13px;margin:18px 0 7px}.drawer-body ul{padding-left:18px}.drawer-body code{color:var(--lime);background:rgba(230,255,69,.06);padding:2px 5px;border-radius:5px}.drawer-foot{padding:12px 18px;border-top:1px solid var(--line);font:9px ui-monospace;color:#616960;text-transform:uppercase;letter-spacing:.07em}
+@media(max-width:900px){.top{align-items:flex-start;flex-direction:column}.actions{justify-content:flex-start}.viewport{max-height:78vh}.canvas{transform:scale(.78);transform-origin:top left}.viewport{height:765px}.sub{max-width:100%}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="top">
+    <div>
+      <div class="eyebrow">PT Berau Coal · One Big Database Safety</div>
+      <h1 class="title">OBDS <em>One-Page Integrated System Map</em></h1>
+      <p class="sub">Satu alur dari masalah bisnis → fondasi ODBC → pembentukan OBDS → knowledge & action → output BC/OHS, dengan governance, maturity, dan dukungan sebagai kontrol lintas-lapisan.</p>
+    </div>
+    <div class="actions">
+      <button class="filter active" data-filter="all">Overview</button>
+      <button class="filter" data-filter="data">Data Foundation</button>
+      <button class="filter" data-filter="knowledge">Knowledge & AI</button>
+      <button class="filter" data-filter="process">Process & Action</button>
+      <button class="filter" data-filter="maturity">Maturity</button>
+      <button class="filter" data-filter="governance">Governance</button>
+      <button class="icon" id="fitBtn" title="Fit to screen">⌖</button>
+      <button class="icon" id="fullBtn" title="Fullscreen">⛶</button>
+    </div>
+  </div>
+
+  <div class="viewport" id="viewport">
+    <div class="canvas" id="canvas">
+      <div class="lane-label" style="left:40px;top:18px">01 · Why & outcome</div>
+      <div class="lane-label" style="left:40px;top:192px">02 · Data → knowledge → action</div>
+      <div class="lane-label" style="left:40px;top:712px">03 · Cross-cutting control</div>
+      <div class="lane-label" style="left:40px;top:804px">04 · Transformation roadmap</div>
+
+      <svg class="links" viewBox="0 0 1600 1045" aria-hidden="true">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#586158"/></marker>
+          <path id="p1" d="M245 91 C265 91 275 91 295 91"/><path id="p2" d="M500 91 C520 91 535 91 555 91"/><path id="p3" d="M760 91 C780 91 795 91 815 91"/><path id="p4" d="M1050 91 C1090 91 1115 91 1155 91"/>
+          <path id="p5" d="M260 390 C280 390 292 390 312 390"/><path id="p6" d="M532 390 C548 390 554 390 570 390"/>
+          <path id="p7" d="M1000 310 C1020 310 1030 310 1050 310"/><path id="p8" d="M1175 310 C1195 310 1200 310 1220 310"/><path id="p9" d="M1340 310 C1360 310 1368 310 1388 310"/>
+          <path id="p10" d="M1000 520 C1020 520 1030 520 1050 520"/><path id="p11" d="M1175 520 C1195 520 1200 520 1220 520"/><path id="p12" d="M1340 520 C1360 520 1368 520 1388 520"/>
+          <path id="p13" d="M1505 310 C1530 310 1535 218 1545 194"/><path id="p14" d="M1505 520 C1530 520 1535 500 1545 500"/>
+          <path id="p15" d="M785 618 C785 668 785 700 785 735"/>
+        </defs>
+        <g marker-end="url(#arrow)">
+          <path class="edge" d="M245 91 C265 91 275 91 295 91"/><path class="edge" d="M500 91 C520 91 535 91 555 91"/><path class="edge" d="M760 91 C780 91 795 91 815 91"/><path class="edge" d="M1050 91 C1090 91 1115 91 1155 91"/>
+          <path class="edge" d="M260 390 C280 390 292 390 312 390"/><path class="edge" d="M532 390 C548 390 554 390 570 390"/>
+          <path class="edge" d="M1000 310 C1020 310 1030 310 1050 310"/><path class="edge" d="M1175 310 C1195 310 1200 310 1220 310"/><path class="edge" d="M1340 310 C1360 310 1368 310 1388 310"/>
+          <path class="edge" d="M1000 520 C1020 520 1030 520 1050 520"/><path class="edge" d="M1175 520 C1195 520 1200 520 1220 520"/><path class="edge" d="M1340 520 C1360 520 1368 520 1388 520"/>
+          <path class="edge" d="M1505 310 C1530 310 1535 218 1545 194"/><path class="edge" d="M1505 520 C1530 520 1535 500 1545 500"/><path class="edge" d="M785 618 C785 668 785 700 785 735"/>
+        </g>
+        <g>
+          <path class="flow" style="stroke:var(--orange);color:var(--orange)" d="M245 91 C265 91 275 91 295 91"/><path class="flow" style="stroke:var(--blue);color:var(--blue)" d="M500 91 C520 91 535 91 555 91"/><path class="flow" style="stroke:var(--gold);color:var(--gold)" d="M760 91 C780 91 795 91 815 91"/><path class="flow" style="stroke:var(--lime);color:var(--lime)" d="M1050 91 C1090 91 1115 91 1155 91"/>
+          <path class="flow" style="stroke:var(--green);color:var(--green)" d="M260 390 C280 390 292 390 312 390"/><path class="flow" style="stroke:var(--blue);color:var(--blue)" d="M532 390 C548 390 554 390 570 390"/>
+          <path class="flow" style="stroke:var(--gold);color:var(--gold)" d="M1000 310 C1020 310 1030 310 1050 310"/><path class="flow" style="stroke:var(--red);color:var(--red)" d="M1175 310 C1195 310 1200 310 1220 310"/><path class="flow" style="stroke:var(--red);color:var(--red)" d="M1340 310 C1360 310 1368 310 1388 310"/>
+          <path class="flow" style="stroke:var(--orange);color:var(--orange)" d="M1000 520 C1020 520 1030 520 1050 520"/><path class="flow" style="stroke:var(--green);color:var(--green)" d="M1175 520 C1195 520 1200 520 1220 520"/><path class="flow" style="stroke:var(--red);color:var(--red)" d="M1340 520 C1360 520 1368 520 1388 520"/>
+          <path class="flow" style="stroke:var(--green);color:var(--green)" d="M1505 310 C1530 310 1535 218 1545 194"/><path class="flow" style="stroke:var(--green);color:var(--green)" d="M1505 520 C1530 520 1535 500 1545 500"/><path class="flow" style="stroke:var(--gold);color:var(--gold)" d="M785 618 C785 668 785 700 785 735"/>
+        </g>
+        <g>
+          <circle class="dot" r="4" fill="var(--orange)" style="color:var(--orange)"><animateMotion dur="3s" repeatCount="indefinite"><mpath href="#p1"/></animateMotion></circle>
+          <circle class="dot" r="4" fill="var(--blue)" style="color:var(--blue)"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#p6"/></animateMotion></circle>
+          <circle class="dot" r="4" fill="var(--red)" style="color:var(--red)"><animateMotion dur="3.4s" repeatCount="indefinite"><mpath href="#p9"/></animateMotion></circle>
+          <circle class="dot" r="4" fill="var(--green)" style="color:var(--green)"><animateMotion dur="3.2s" repeatCount="indefinite"><mpath href="#p12"/></animateMotion></circle>
+        </g>
+      </svg>
+
+      <!-- Storyline -->
+      <div class="card story current" data-track="story data" data-key="current" style="left:40px;top:48px;width:205px"><span class="plus">+</span><small>Current condition</small><b>28 Modul · 5 Domain</b><p>Data banyak, tetapi ERD, identifier, definisi, dan relasi masih tersebar.</p></div>
+      <div class="card story foundation" data-track="story data" data-key="odbc" style="left:295px;top:48px;width:205px"><span class="plus">+</span><small>Existing foundation</small><b>ODBC · CATALYST</b><p>Data Lake, Warehouse, One Map, dan Data Services sudah tersedia.</p></div>
+      <div class="card story gap" data-track="story governance" data-key="gap" style="left:555px;top:48px;width:205px"><span class="plus">+</span><small>Key gap</small><b>Belum Canonical</b><p>Golden identity, taxonomy, lineage, ownership, dan quality belum konsisten.</p></div>
+      <div class="card story intent" data-track="story data knowledge process" data-key="intent" style="left:815px;top:48px;width:235px"><span class="plus">+</span><small>OBDS intent</small><b>Trusted Safety Data Foundation</b><p>Memperdalam domain safety di atas ODBC—bukan mengganti sistem existing.</p></div>
+      <div class="card story outcome" data-track="story knowledge process" data-key="outcomes" style="left:1155px;top:48px;width:405px"><span class="plus">+</span><small>Target outcome</small><b>BC Visibility · OHS Intervention · AI-Ready Data</b><p>Visibilitas, prioritas intervensi, dan pemanfaatan AI yang traceable serta governed.</p></div>
+
+      <!-- source and platform -->
+      <div class="cluster" data-track="data" style="left:40px;top:226px;width:220px;height:390px;--c:var(--green)"><div class="cluster-title"><b>Operational Sources</b> · system of record</div></div>
+      <div class="card source" data-track="data" data-key="modules" style="left:58px;top:275px;width:184px;height:112px"><span class="plus">+</span><small>Primary sources</small><b>28 BeGeMS Modules</b><p>OHS · SCE · MPTS · Audit · OSREL.</p><div class="chips"><span class="chip">Incident</span><span class="chip">Hazard</span><span class="chip">Health</span></div></div>
+      <div class="card source" data-track="data" data-key="evidence" style="left:58px;top:405px;width:184px;height:86px"><span class="plus">+</span><small>Supporting evidence</small><b>Documents & Sensors</b><p>SOP, investigation, CCTV, DMS, inspection, and field records.</p></div>
+      <div class="card neutral" data-track="data governance" data-key="sourceControl" style="left:58px;top:509px;width:184px;height:82px"><span class="plus">+</span><small>Source controls</small><b>Owner · Metadata · Lineage</b><p>Setiap data tetap dapat ditelusuri ke sumbernya.</p></div>
+
+      <div class="cluster" data-track="data" style="left:312px;top:260px;width:220px;height:260px;--c:var(--blue)"><div class="cluster-title"><b>ODBC Platform</b> · existing foundation</div></div>
+      <div class="card platform" data-track="data" data-key="catalyst" style="left:330px;top:307px;width:184px;height:110px"><span class="plus">+</span><small>Enterprise platform</small><b>CATALYST · Lakehouse</b><p>CDC/ELT · Bronze · Silver · Gold · Warehouse/Mart.</p></div>
+      <div class="card platform" data-track="data" data-key="services" style="left:330px;top:435px;width:184px;height:66px"><span class="plus">+</span><small>Existing outputs</small><b>One Map · Data Services</b></div>
+
+      <!-- OBDS core -->
+      <section class="obds-core" data-track="data knowledge governance">
+        <div class="core-head"><b>OBDS Core</b><span>logical domain layer</span></div>
+        <div class="layer" data-track="data" data-key="processing" style="--lc:var(--blue)"><b>02 · Data Processing</b><span>Ingestion, mapping, data-quality tests, reproducible transformation, and data product pipeline.</span></div>
+        <div class="layer" data-track="data governance" data-key="canonical" style="--lc:var(--orange)"><b>03 · Canonical & MDM</b><span>Golden worker_id, organization_id, location_id, shared entities, taxonomy, and reference data.</span></div>
+        <div class="layer" data-track="knowledge" data-key="semantic" style="--lc:var(--gold)"><b>04 · Knowledge & Semantic</b><span>Business glossary, semantic relationships, knowledge graph, vector index, and contextual evidence.</span></div>
+        <div class="layer" data-track="knowledge process" data-key="dataProducts" style="--lc:var(--lime)"><b>05 · AI-Ready Data Product</b><span>Trusted datasets, features, cited evidence, and API contracts for analytics, LLM, and agents.</span></div>
+        <div class="layer" data-track="governance" data-key="obdsGovernance" style="--lc:var(--gold)"><b>Cross-Layer Control</b><span>RACI, access, quality, security, risk, lifecycle, acceptance criteria, and human review.</span></div>
+      </section>
+
+      <!-- knowledge pathway -->
+      <div class="pathway" data-track="knowledge" style="left:1030px;top:226px;width:510px;height:180px;--c:var(--gold)"><h3>WHAT AI KNOWS <span>knowledge pathway</span></h3></div>
+      <div class="mini knowledge" data-track="knowledge" data-key="stores" style="left:1050px;top:274px;width:125px;height:76px"><small>Storage</small><b>Warehouse · Vector · Graph</b><span>Structured, semantic, relational evidence.</span></div>
+      <div class="mini ai" data-track="knowledge" data-key="rag" style="left:1220px;top:274px;width:120px;height:76px"><small>Retrieval</small><b>RAG Engine</b><span>Context selection + citation.</span></div>
+      <div class="mini ai" data-track="knowledge governance" data-key="gateway" style="left:1388px;top:274px;width:117px;height:76px"><small>Control</small><b>LLM Gateway</b><span>Policy, routing, logging.</span></div>
+      <div class="mini governance" data-track="knowledge governance" data-key="guardrails" style="left:1220px;top:359px;width:285px;height:35px;padding:8px 11px"><small>Guardrails · RLS · citation · observability · NIST AI RMF</small></div>
+
+      <!-- process pathway -->
+      <div class="pathway" data-track="process" style="left:1030px;top:436px;width:510px;height:180px;--c:var(--orange)"><h3>WHAT AI DOES <span>process & action pathway</span></h3></div>
+      <div class="mini process" data-track="process" data-key="bpmrpaai" style="left:1050px;top:484px;width:125px;height:76px"><small>Inputs</small><b>BPM + RPA + AI</b><span>Process, rules, and intelligence.</span></div>
+      <div class="mini output" data-track="process" data-key="ipa" style="left:1220px;top:484px;width:120px;height:76px"><small>Workflow</small><b>IPA</b><span>Intelligent process automation.</span></div>
+      <div class="mini ai" data-track="process governance" data-key="agentic" style="left:1388px;top:484px;width:117px;height:76px"><small>Goals</small><b>Agentic AI</b><span>Goal-based with approval.</span></div>
+      <div class="mini governance" data-track="process governance" data-key="human" style="left:1220px;top:569px;width:285px;height:35px;padding:8px 11px"><small>Human-in-the-loop · authority · SLA · escalation · audit trail</small></div>
+
+      <!-- outcomes -->
+      <div class="outcome-box output" data-track="knowledge process" data-key="bc" style="left:1318px;top:142px;--c:var(--blue)"><small>Expected Output · BC</small><b>Visibility & Decision Support</b><p>One Map Prioritas Risiko · Executive Visibility · reusable data services.</p></div>
+      <div class="outcome-box output" data-track="process knowledge" data-key="ohs" style="left:1318px;top:614px;--c:var(--green)"><small>Expected Output · OHS</small><b>Prioritized Intervention</b><p>Single source of truth · precursor–incident linkage · hotspot & critical control intervention.</p></div>
+
+      <!-- Governance -->
+      <div class="govern-bar" data-track="governance">
+        <strong>Cross-Cutting Governance</strong>
+        <span><b>Accountability</b><br/>Sponsor · Owner · Steward · Custodian</span>
+        <span><b>Trust</b><br/>Metadata · Lineage · DQ · Acceptance Criteria</span>
+        <span><b>Protection</b><br/>Role-based access · Security · Privacy</span>
+        <span><b>Responsible AI</b><br/>Citation · Monitoring · Human Review</span>
+        <span><b>Operational Control</b><br/>Decision authority · SLA · Escalation · Closure</span>
+      </div>
+
+      <!-- Maturity -->
+      <section class="maturity" data-track="maturity">
+        <div class="maturity-head"><b>Transformation Maturity — setiap level membangun level sebelumnya</b><span>Target MVP: L2 Canonical · kemudian scale ke L3–L4</span></div>
+        <div class="levels">
+          <div class="level" data-key="l0" style="--lc:var(--orange)"><small>L0 · Existing</small><b>Fragmented</b><span>Data silo, definisi, ERD, dan identifier berbeda.</span></div>
+          <div class="level" data-key="l1" style="--lc:var(--gold)"><small>L1 · Organize</small><b>Cataloged</b><span>Registry, owner, steward, metadata, and source lineage.</span></div>
+          <div class="level target" data-key="l2" style="--lc:var(--lime)"><small>L2 · MVP Target</small><b>Canonical</b><span>Golden record, shared entities, taxonomy, DQ, and governed data products.</span></div>
+          <div class="level" data-key="l3" style="--lc:var(--blue)"><small>L3 · Scale</small><b>Reproducible</b><span>Repeatable analytics, semantic layer, model validation, and monitored data pipelines.</span></div>
+          <div class="level" data-key="l4" style="--lc:var(--green)"><small>L4 · Intelligence</small><b>LLM + Agentic</b><span>Cited insight, automated workflow, and controlled action with human approval.</span></div>
+        </div>
+      </section>
+
+      <div class="support" data-track="governance maturity">
+        <strong>Need Support & Next Step</strong>
+        <span><b>Mandate</b><br/>Sponsor lintas fungsi dan decision authority</span>
+        <span><b>Pilot</b><br/>Pilih 3–5 modul + canonical worker_id</span>
+        <span><b>Ownership</b><br/>Tetapkan owner, steward, IT/CATALYST custodian</span>
+        <span><b>MVP</b><br/>Acceptance criteria · 3–6 bulan · scale bertahap</span>
+      </div>
+    </div>
+  </div>
+  <div class="legend">
+    <span><i style="--c:var(--green)"></i>source/output</span><span><i style="--c:var(--blue)"></i>data platform</span><span><i style="--c:var(--orange)"></i>process/canonical</span><span><i style="--c:var(--gold)"></i>governance/knowledge</span><span><i style="--c:var(--red)"></i>AI/LLM</span><span>Click node for detail · use focus filters to simplify the map</span>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head"><i class="drawer-dot" id="drawerDot"></i><div><small id="drawerKicker">DETAIL</small><h3 id="drawerTitle">—</h3></div><button class="close" id="closeBtn">×</button></div>
+  <div class="drawer-body" id="drawerBody"></div><div class="drawer-foot">OBDS · trusted data → trusted decision → trusted action</div>
+</aside>
+
+<script>
+const DETAIL={
+ current:{k:'Current condition',t:'28 Modul · 5 Domain',c:'var(--orange)',b:'<h4>Masalah bisnis</h4><p>Data safety sudah tersedia dalam banyak modul, tetapi belum dibaca sebagai satu sistem. Perbedaan ERD, identifier, definisi, dan ownership membuat analisis lintas-domain sulit direproduksi.</p><h4>Implikasi</h4><ul><li>Duplikasi dan rekonsiliasi manual.</li><li>Hubungan precursor–incident tidak konsisten.</li><li>AI berisiko membaca data yang tidak memiliki konteks tunggal.</li></ul>'},
+ odbc:{k:'Existing foundation',t:'ODBC · CATALYST',c:'var(--blue)',b:'<p>ODBC tetap menjadi fondasi enterprise: ingestion, lakehouse, warehouse, One Map, dan data services. OBDS tidak mengganti ODBC; OBDS memperdalam domain safety melalui canonical model, MDM, semantic, dan governance.</p>'},
+ gap:{k:'Key gap',t:'Belum Canonical',c:'var(--gold)',b:'<p>Gap utama berada di antara data yang sudah terkumpul dan data yang dapat dipercaya untuk keputusan.</p><ul><li>Belum ada golden identity lintas modul.</li><li>Taxonomy dan business glossary belum seragam.</li><li>Lineage, owner, steward, dan quality rule belum konsisten.</li><li>Output analitik belum selalu reproducible.</li></ul>'},
+ intent:{k:'OBDS intent',t:'Trusted Safety Data Foundation',c:'var(--lime)',b:'<p>OBDS adalah logical domain layer di atas ODBC yang menyatukan shared core entities, canonical taxonomy, master data, semantic relationship, dan governed data products.</p><h4>Prinsip</h4><ul><li>Incremental, bukan big-bang migration.</li><li>Source system tetap menjadi system of record.</li><li>Traceable dari output kembali ke sumber.</li><li>Human-in-the-loop untuk keputusan dan aksi.</li></ul>'},
+ outcomes:{k:'Target outcome',t:'BC Visibility · OHS Intervention · AI-Ready Data',c:'var(--green)',b:'<p>Output tidak berhenti pada dashboard. Data harus mendorong visibilitas, prioritas, intervensi, dan penutupan tindakan.</p><div class="detail-grid"><span><b>BC</b> executive visibility dan reusable data services.</span><span><b>OHS</b> prioritized intervention dan critical control monitoring.</span><span><b>AI</b> cited insight dan governed agents.</span><span><b>Assurance</b> lineage, quality, ownership, dan audit trail.</span></div>'},
+ modules:{k:'Operational sources',t:'28 BeGeMS Modules',c:'var(--green)',b:'<p>Modul operasional tetap menjadi sumber data utama. Prioritas bukan mengubah aplikasinya, tetapi memetakan entity, key, event, status, dan relationship ke canonical model OBDS.</p>'},
+ evidence:{k:'Supporting evidence',t:'Documents & Sensors',c:'var(--green)',b:'<p>OBDS juga perlu menghubungkan evidence tidak terstruktur dan streaming: SOP, laporan investigasi, foto, CCTV, DMS, inspeksi, dan catatan lapangan.</p>'},
+ sourceControl:{k:'Source controls',t:'Owner · Metadata · Lineage',c:'var(--gray)',b:'<p>Setiap source harus memiliki owner, steward, refresh cadence, sensitivity, quality rule, serta lineage yang menjelaskan bagaimana data berubah hingga menjadi output.</p>'},
+ catalyst:{k:'ODBC platform',t:'CATALYST · Lakehouse',c:'var(--blue)',b:'<p>Lapisan platform menangani ingestion dan processing: CDC/ELT, bronze–silver–gold, warehouse/mart, orchestration, observability, dan data quality test.</p>'},
+ services:{k:'ODBC outputs',t:'One Map · Data Services',c:'var(--blue)',b:'<p>Output existing tetap digunakan. OBDS menambahkan context, shared entity, taxonomy, dan semantic meaning agar output konsisten lintas fungsi.</p>'},
+ processing:{k:'OBDS layer 02',t:'Data Processing',c:'var(--blue)',b:'<p>Source-to-target mapping, standardized transformation, data-quality checks, versioning, orchestration, dan reproducible pipeline. Tujuannya: output yang sama menghasilkan hasil yang sama.</p>'},
+ canonical:{k:'OBDS layer 03',t:'Canonical & Master Data',c:'var(--orange)',b:'<p>Canonical menyatukan format dan definisi tanpa menghapus ERD modul.</p><ul><li><code>worker_id</code> sebagai golden identity.</li><li><code>organization_id</code>, <code>location_id</code>, asset, activity, hazard, control, incident, dan action.</li><li>Reference data dan taxonomy yang disetujui owner domain.</li></ul>'},
+ semantic:{k:'OBDS layer 04',t:'Knowledge & Semantic',c:'var(--gold)',b:'<p>Layer ini menjawab bukan hanya “apa nilainya”, tetapi “apa maknanya dan bagaimana relasinya”. Komponennya: business glossary, semantic layer, knowledge graph, vector index, dan evidence linkage.</p>'},
+ dataProducts:{k:'OBDS layer 05',t:'AI-Ready Data Product',c:'var(--lime)',b:'<p>Data product memiliki contract, owner, SLA, acceptance criteria, lineage, test, dan intended use. Produk ini menjadi input analytics, predictive model, LLM, dan agentic workflow.</p>'},
+ obdsGovernance:{k:'Cross-layer control',t:'Governance · Security · Quality · Risk',c:'var(--gold)',b:'<p>Governance bukan tahap terakhir, tetapi control spine dari source hingga action.</p><ul><li>RACI dan decision authority.</li><li>Role-based access dan classification.</li><li>DQ threshold, exception, and remediation.</li><li>Model/LLM monitoring, citation, and human approval.</li></ul>'},
+ stores:{k:'Knowledge storage',t:'Warehouse · Vector · Graph',c:'var(--gold)',b:'<p>Tiga cara konsumsi saling melengkapi: warehouse untuk angka terstruktur, vector untuk similarity/semantic retrieval, dan graph untuk hubungan entity serta causal context.</p>'},
+ rag:{k:'Retrieval',t:'RAG Engine',c:'var(--red)',b:'<p>RAG memilih evidence yang relevan sebelum LLM menjawab. Jawaban harus menyertakan sumber, version, dan lineage agar dapat diverifikasi.</p>'},
+ gateway:{k:'LLM control',t:'LLM Gateway',c:'var(--red)',b:'<p>Pintu tunggal untuk routing model, policy, prompt/template governance, logging, cost control, security, observability, dan model fallback.</p>'},
+ guardrails:{k:'Responsible AI',t:'Guardrails',c:'var(--gold)',b:'<p>Minimum guardrails: role-based access, source citation, confidence/uncertainty, prohibited actions, human review, audit trail, and monitoring mengikuti prinsip NIST AI RMF.</p>'},
+ bpmrpaai:{k:'Process inputs',t:'BPM + RPA + AI',c:'var(--orange)',b:'<ul><li><b>BPM</b> memperbaiki alur dan kontrol proses.</li><li><b>RPA</b> mengotomasi langkah berulang dengan rule jelas.</li><li><b>AI</b> membaca pola, bahasa, prediksi, dan rekomendasi.</li></ul>'},
+ ipa:{k:'Intelligent workflow',t:'IPA',c:'var(--green)',b:'<p>IPA menyatukan proses, rule-based automation, dan AI menjadi workflow cerdas. Fokusnya bukan teknologi terpisah, tetapi end-to-end process dari detection hingga closure.</p>'},
+ agentic:{k:'Goal-based action',t:'Agentic AI',c:'var(--red)',b:'<p>Agentic AI bekerja berdasarkan tujuan dan context, tetapi tetap dibatasi tools, authority, guardrails, SLA, dan human approval.</p><h4>Contoh</h4><ul><li>Investigation assistant.</li><li>Corrective action tracker.</li><li>Contractor risk profile.</li><li>Operational monitoring agent.</li></ul>'},
+ human:{k:'Operational control',t:'Human-in-the-Loop',c:'var(--gold)',b:'<p>AI mengusulkan; manusia memutuskan. Harus jelas siapa yang menerima alert, siapa yang berwenang bertindak, berapa SLA-nya, jalur eskalasi, dan bukti closure.</p>'},
+ bc:{k:'Expected output · BC',t:'Visibility & Decision Support',c:'var(--blue)',b:'<ul><li>One Map prioritas risiko.</li><li>Executive visibility lintas fungsi.</li><li>Reusable data services dengan definisi konsisten.</li><li>Faster decision cycle dan management monitoring.</li></ul>'},
+ ohs:{k:'Expected output · OHS',t:'Prioritized Intervention',c:'var(--green)',b:'<ul><li>Single source of truth worker, contractor, incident, hazard, control, and action.</li><li>Precursor-to-incident linkage.</li><li>Hotspot concern dan critical control monitoring.</li><li>Intervention tracking hingga closure dan effectiveness review.</li></ul>'},
+ l0:{k:'Maturity',t:'L0 Fragmented',c:'var(--orange)',b:'<p>Data dan definisi tersebar. Analisis bergantung pada rekonsiliasi manual.</p>'},l1:{k:'Maturity',t:'L1 Cataloged',c:'var(--gold)',b:'<p>Source registry, owner, steward, metadata, dan lineage mulai terbentuk.</p>'},l2:{k:'Maturity target',t:'L2 Canonical',c:'var(--lime)',b:'<p>Target MVP: golden record, shared entities, canonical taxonomy, DQ rules, dan governed data products.</p>'},l3:{k:'Maturity',t:'L3 Reproducible',c:'var(--blue)',b:'<p>Pipeline, analytics, dan model dapat dijalankan ulang dengan hasil yang konsisten dan tervalidasi.</p>'},l4:{k:'Maturity',t:'L4 Intelligence',c:'var(--green)',b:'<p>LLM dan agents mengonsumsi trusted data untuk insight dan action yang traceable, monitored, dan human-approved.</p>'}
+};
+const drawer=document.getElementById('drawer'),scrim=document.getElementById('scrim');
+function openDetail(key){const d=DETAIL[key];if(!d)return;drawer.style.setProperty('--dc',d.c);document.getElementById('drawerKicker').textContent=d.k;document.getElementById('drawerTitle').textContent=d.t;document.getElementById('drawerBody').innerHTML=d.b;drawer.classList.add('show');scrim.classList.add('show')}
+function closeDetail(){drawer.classList.remove('show');scrim.classList.remove('show')}
+document.querySelectorAll('[data-key]').forEach(el=>{el.tabIndex=0;el.addEventListener('click',()=>openDetail(el.dataset.key));el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openDetail(el.dataset.key)}})});document.getElementById('closeBtn').onclick=closeDetail;scrim.onclick=closeDetail;window.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail()});
+const focusables=[...document.querySelectorAll('[data-track]')];document.querySelectorAll('.filter').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===btn));const f=btn.dataset.filter;focusables.forEach(el=>{if(f==='all'){el.classList.remove('dim','focus')}else{const hit=(el.dataset.track||'').split(/\s+/).includes(f);el.classList.toggle('focus',hit);el.classList.toggle('dim',!hit)}})});
+const viewport=document.getElementById('viewport'),canvas=document.getElementById('canvas');let fitted=false;function fit(){if(window.innerWidth<1000){const scale=Math.min((viewport.clientWidth-4)/1600,.82);canvas.style.transform=`scale(${scale})`;viewport.style.height=(1045*scale+4)+'px';fitted=true}else{canvas.style.transform='none';viewport.style.height='auto';fitted=false}}document.getElementById('fitBtn').onclick=fit;window.addEventListener('resize',()=>{if(fitted||window.innerWidth<1000)fit()});if(window.innerWidth<1000)fit();
+document.getElementById('fullBtn').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};
+</script>
+</body>
+</html>

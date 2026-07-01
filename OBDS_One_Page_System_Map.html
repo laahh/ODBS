@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OBDS One Page System Map — PT Berau Coal</title>
+<style>
+:root{
+  --bg:#0B0E14;--bg2:#11161F;--panel:#141A24;--panel2:#101621;
+  --ink:#E9EEF6;--soft:#AEBACB;--muted:#718099;--line:#253044;--grid:#141B27;
+  --source:#42C88A;--data:#63A9F4;--process:#FF9B62;--gov:#E7BE4C;--ai:#F1747B;--neutral:#93A1B8;
+  --shadow:0 18px 50px rgba(0,0,0,.38);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
+body{font-family:Inter,"Segoe UI",Arial,sans-serif;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:28px 28px}
+.page{max-width:1720px;margin:0 auto;padding:20px 18px 38px}
+header{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:13px}
+.eyebrow{margin:0 0 5px;font-family:Consolas,"Courier New",monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--data)}
+h1{margin:0;font-size:clamp(22px,3vw,34px);letter-spacing:-.035em;line-height:1.05}h1 span{color:var(--muted);font-weight:500}
+.sub{margin:7px 0 0;color:var(--soft);font-size:13px;max-width:920px;line-height:1.5}
+.toolbar{margin-left:auto;display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.toolbar button{border:1px solid var(--line);background:var(--bg2);color:var(--soft);padding:8px 11px;border-radius:999px;cursor:pointer;font-weight:650;font-size:11px;transition:.15s}
+.toolbar button:hover{border-color:var(--data);color:var(--ink)}
+.toolbar button.on{background:var(--ink);border-color:var(--ink);color:#09101a}
+.canvasWrap{position:relative;border:1px solid var(--line);border-radius:16px;background:rgba(20,26,36,.94);box-shadow:var(--shadow);overflow:auto}
+.board{display:block;width:100%;min-width:1320px;height:auto}
+.zone{stroke:var(--line);stroke-width:1;fill:rgba(8,13,21,.24)}
+.zone.alt{fill:rgba(255,255,255,.012)}
+.zoneTitle{font-family:Consolas,"Courier New",monospace;font-size:13px;font-weight:700;letter-spacing:.12em;fill:var(--muted)}
+.phaseTitle{font-family:Inter,"Segoe UI",sans-serif;font-size:11px;font-weight:750;letter-spacing:.13em;fill:var(--muted)}
+.edgeBase{fill:none;stroke:var(--line);stroke-width:2.2}
+.edgeFlow{fill:none;stroke-width:2.7;stroke-linecap:round;stroke-dasharray:1 14;opacity:.95;animation:dash 1.05s linear infinite;filter:drop-shadow(0 0 4px currentColor)}
+.edgeFlow.dashed{stroke-dasharray:6 10;opacity:.8}
+@keyframes dash{to{stroke-dashoffset:-30}}
+.spark{filter:drop-shadow(0 0 6px currentColor)}
+.gnode{width:100%;height:100%;border:1px solid var(--line);border-radius:12px;background:var(--bg2);color:var(--ink);display:flex;flex-direction:column;overflow:hidden;text-align:left;padding:0;cursor:pointer;position:relative;transition:opacity .2s,filter .2s,transform .15s,border-color .15s,box-shadow .15s;font-family:inherit}
+.gnode:hover{transform:translateY(-2px);border-color:var(--nc);box-shadow:0 12px 28px rgba(0,0,0,.44)}
+.gnode .bar{height:5px;flex:0 0 5px;background:var(--nc)}
+.gnode .body{padding:11px 13px;display:flex;flex-direction:column;justify-content:center;gap:4px;flex:1;min-height:0}
+.gnode .lab{font-weight:750;font-size:14px;line-height:1.15;letter-spacing:-.015em}
+.gnode.big .lab{font-size:18px}
+.gnode .tag{font-family:Consolas,"Courier New",monospace;font-size:9.5px;color:var(--muted);line-height:1.35;letter-spacing:.02em}
+.gnode .plus{position:absolute;right:9px;top:8px;color:var(--nc);font-size:14px;opacity:.75;font-family:Consolas,monospace}
+.gnode .chips{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.gnode .chip{border:1px solid #2b374b;background:#0d131d;border-radius:999px;padding:3px 6px;font-family:Consolas,monospace;font-size:8.3px;color:var(--soft)}
+.gnode .stack{display:grid;grid-template-columns:1fr;gap:4px;margin-top:6px}
+.gnode .stack span{display:flex;align-items:center;justify-content:space-between;border:1px solid #29354a;background:#0e141e;border-radius:6px;padding:4px 7px;font-family:Consolas,monospace;font-size:8.6px;color:var(--soft)}
+.gnode .stack span b{color:var(--nc);font-weight:700}
+.dim{opacity:.12!important;filter:grayscale(.5)}
+.edgeDim{opacity:.06!important}
+.caption{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin:11px 3px 0;color:var(--muted);font-size:10.5px;font-family:Consolas,"Courier New",monospace}
+.caption span{display:inline-flex;align-items:center;gap:6px}.caption i{width:10px;height:10px;border-radius:3px}
+.note{margin-left:auto;color:var(--soft)}
+.scrim{position:fixed;inset:0;background:rgba(4,7,12,.56);opacity:0;pointer-events:none;transition:.2s;z-index:80}.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;right:0;top:0;height:100%;width:min(440px,93vw);background:var(--bg2);border-left:1px solid var(--line);box-shadow:-20px 0 60px rgba(0,0,0,.55);z-index:90;transform:translateX(102%);transition:transform .28s cubic-bezier(.25,.8,.25,1);display:flex;flex-direction:column}.drawer.on{transform:none}
+.dhead{padding:19px 20px 15px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:flex-start}.ddot{width:12px;height:12px;border-radius:4px;background:var(--dc);margin-top:5px;flex:none}.dtitle{margin:0;font-size:20px;line-height:1.12}.dkey{margin-top:4px;font-family:Consolas,monospace;font-size:10px;color:var(--muted);letter-spacing:.05em}.close{margin-left:auto;border:1px solid var(--line);background:transparent;color:var(--soft);border-radius:8px;width:31px;height:31px;cursor:pointer}.close:hover{color:var(--ai);border-color:var(--ai)}
+.dbody{padding:17px 20px 24px;overflow:auto;color:var(--soft);font-size:13.5px;line-height:1.62}.dbody b{color:var(--ink)}.dbody ul{margin:8px 0;padding-left:19px}.dbody li{margin:5px 0}.dbody code{font-family:Consolas,monospace;font-size:12px;color:var(--process);background:var(--panel);padding:2px 5px;border-radius:4px}
+@media(max-width:900px){.toolbar{margin-left:0;justify-content:flex-start}.page{padding:14px 10px 30px}.board{min-width:1250px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <header>
+   
+    <div class="toolbar" id="toolbar">
+      <button class="on" data-focus="all">Semua</button>
+      <button data-focus="why">1 · Why</button>
+      <button data-focus="foundation">2 · Foundation</button>
+      <button data-focus="intelligence">3 · Intelligence</button>
+      <button data-focus="outcome">4 · Outcome</button>
+      <button data-focus="roadmap">Roadmap</button>
+      <button data-focus="support">Support</button>
+    </div>
+  </header>
+
+  <div class="canvasWrap" id="canvas"></div>
+  <div class="caption">
+    <span><i style="background:var(--source)"></i>sumber / output</span>
+    <span><i style="background:var(--data)"></i>platform data</span>
+    <span><i style="background:var(--process)"></i>proses / OBDS</span>
+    <span><i style="background:var(--gov)"></i>governance</span>
+    <span><i style="background:var(--ai)"></i>AI / agentic</span>
+    <span class="note">Klik node untuk membuka penjelasan · gunakan filter agar tidak terasa padat.</span>
+  </div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer">
+  <div class="dhead"><span class="ddot" id="ddot"></span><div><h2 class="dtitle" id="dtitle">—</h2><div class="dkey" id="dkey"></div></div><button class="close" id="close">✕</button></div>
+  <div class="dbody" id="dbody"></div>
+</aside>
+
+<script>
+const C={source:'--source',data:'--data',process:'--process',gov:'--gov',ai:'--ai',neutral:'--neutral'};
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(C[v]||v).trim();
+
+const NODES=[
+  {id:'cc',x:40,y:70,w:235,h:74,c:'gov',lab:'Current Condition',tag:'28 modul · data tersebar · ID tidak seragam',g:'why'},
+  {id:'need',x:320,y:70,w:235,h:74,c:'gov',lab:'Current Need',tag:'single source of truth · standard · trustworthy',g:'why'},
+  {id:'intent',x:600,y:62,w:270,h:90,c:'process',lab:'OBDS Intent',tag:'logical safety data foundation di atas existing ODBC',g:'why foundation',big:true},
+  {id:'bc',x:1370,y:52,w:225,h:78,c:'data',lab:'Expected Output (BC)',tag:'business decision · assurance · value',g:'outcome'},
+  {id:'ohs',x:1370,y:145,w:225,h:78,c:'ai',lab:'Expected Output (OHS)',tag:'operational control · prevention · learning',g:'outcome'},
+
+  {id:'modules',x:40,y:285,w:220,h:104,c:'source',lab:'28 Modul BeGeMS',tag:'OHS · SCE · MPTS · AUDIT · OSREL',g:'foundation'},
+  {id:'odbc',x:305,y:300,w:205,h:74,c:'data',lab:'ODBC / CATALYST',tag:'lake · warehouse · mart · data services',g:'foundation'},
+  {id:'obds',x:555,y:235,w:285,h:220,c:'process',lab:'OBDS Core',tag:'canonical model · MDM · semantic layer',g:'foundation intelligence',big:true,
+   stack:[['SOURCE','system of record'],['RAW','landing / historical'],['CANONICAL','common taxonomy'],['MASTER','golden record'],['KNOWLEDGE','AI-ready context']]},
+  {id:'knows',x:900,y:225,w:220,h:128,c:'data',lab:'What AI Knows',tag:'knowledge path',g:'intelligence foundation',chips:['Warehouse','Vector DB','Knowledge Graph']},
+  {id:'does',x:900,y:385,w:220,h:128,c:'gov',lab:'What AI Does',tag:'capability path',g:'intelligence',chips:['Feature Store','Predictive Models','Agents · Skills']},
+  {id:'rag',x:1170,y:240,w:170,h:82,c:'ai',lab:'RAG / Retrieval',tag:'grounded answer · citation',g:'intelligence'},
+  {id:'tools',x:1170,y:400,w:170,h:82,c:'gov',lab:'Tools + Guardrails',tag:'RLS · policy · human review',g:'intelligence support'},
+  {id:'gateway',x:1370,y:300,w:225,h:100,c:'ai',lab:'LLM Gateway + Orchestrator',tag:'governed access · logging · routing',g:'intelligence'},
+  {id:'apps',x:1370,y:430,w:225,h:92,c:'source',lab:'AI Agents · Apps · Dashboard',tag:'copilot · workflow · analytics · action',g:'intelligence outcome',big:true},
+
+  {id:'m0',x:40,y:690,w:220,h:82,c:'process',lab:'L0 · Fragmented',tag:'existing silos',g:'roadmap foundation'},
+  {id:'m1',x:305,y:690,w:205,h:82,c:'gov',lab:'L1 · Cataloged',tag:'inventory · owner · registry',g:'roadmap foundation'},
+  {id:'m2',x:555,y:690,w:285,h:82,c:'data',lab:'L2 · Canonical',tag:'target · common model · golden record',g:'roadmap foundation'},
+  {id:'m3',x:900,y:690,w:220,h:82,c:'data',lab:'L3 · Reproducible',tag:'trusted analytics · reusable features',g:'roadmap intelligence'},
+  {id:'m4',x:1370,y:690,w:225,h:82,c:'source',lab:'L4 · Intelligence',tag:'LLM · predictive · agentic',g:'roadmap intelligence outcome'},
+
+  {id:'auto',x:555,y:845,w:285,h:76,c:'neutral',lab:'BPM + RPA + AI',tag:'process · rule automation · intelligence',g:'roadmap'},
+  {id:'ipa',x:930,y:845,w:210,h:76,c:'source',lab:'IPA',tag:'intelligent workflow',g:'roadmap intelligence'},
+  {id:'agentic',x:1250,y:845,w:220,h:76,c:'ai',lab:'AGENTIC',tag:'goals, not only steps',g:'roadmap intelligence outcome'},
+
+  {id:'support',x:40,y:1000,w:1555,h:74,c:'gov',lab:'Need Support — Management & Governance',tag:'BoD sponsorship · domain owner/steward · IT/CATALYST · akses schema · anggaran MVP · workshop validasi',g:'support foundation intelligence outcome'}
+];
+
+const EDGES=[
+  ['cc','need','gov','why'],['need','intent','gov','why'],['intent','obds','process','why foundation',true],
+  ['modules','odbc','source','foundation'],['odbc','obds','data','foundation'],
+  ['obds','knows','data','foundation intelligence'],['obds','does','process','foundation intelligence'],
+  ['knows','rag','data','intelligence'],['does','tools','gov','intelligence support'],
+  ['rag','gateway','ai','intelligence'],['tools','gateway','gov','intelligence support'],
+  ['gateway','apps','ai','intelligence outcome'],['apps','bc','data','outcome'],['apps','ohs','ai','outcome'],
+  ['m0','m1','gov','roadmap'],['m1','m2','data','roadmap'],['m2','m3','data','roadmap'],['m3','m4','source','roadmap'],
+  ['modules','m0','process','roadmap foundation',true],['odbc','m1','gov','roadmap foundation',true],['obds','m2','data','roadmap foundation',true],['knows','m3','data','roadmap intelligence',true],['apps','m4','source','roadmap outcome',true],
+  ['auto','ipa','source','roadmap intelligence'],['ipa','agentic','ai','roadmap intelligence outcome'],['m2','auto','neutral','roadmap',true],['m4','agentic','ai','roadmap intelligence outcome',true],
+  ['support','odbc','gov','support foundation',true],['support','obds','gov','support foundation',true],['support','tools','gov','support intelligence',true],['support','apps','gov','support outcome',true]
+];
+
+const DETAIL={
+cc:{k:'WHY · kondisi saat ini',h:'Data safety telah tersedia, tetapi masih tersebar pada banyak modul, menggunakan struktur dan identifier yang berbeda, serta belum mudah ditelusuri lintas domain.'},
+need:{k:'WHY · kebutuhan',h:'Dibutuhkan <b>single source of truth</b>, standard definisi data, golden record untuk entitas inti, lineage, quality rule, dan akses yang aman untuk analytics maupun AI.'},
+intent:{k:'WHY → FOUNDATION',h:'OBDS diposisikan sebagai <b>logical data foundation</b>, bukan aplikasi baru yang mengganti sistem existing. OBDS menyatukan makna, identitas, relasi, dan governance di atas ODBC/CATALYST.'},
+bc:{k:'OUTCOME · business',h:'<ul><li>Executive view lintas site dan kontraktor</li><li>Assurance dan reporting yang konsisten</li><li>Prioritas intervensi berbasis risiko</li><li>Value tracking dari data ke keputusan</li></ul>'},
+ohs:{k:'OUTCOME · operational',h:'<ul><li>Golden record pekerja dan organisasi</li><li>Investigasi lebih cepat dan tersitasi</li><li>Early warning fatigue / HIPO</li><li>Corrective action terlacak end-to-end</li><li>Pembelajaran lintas insiden dan leading indicator</li></ul>'},
+modules:{k:'FOUNDATION · system of record',h:'Modul existing tetap menjadi sumber transaksi operasional. Integrasi dilakukan tanpa mematikan fungsi aplikasi sumber.'},
+odbc:{k:'FOUNDATION · platform existing',h:'ODBC/CATALYST menyediakan lake, warehouse, mart, dan layanan data. OBDS memakai ulang fondasi ini agar investasi existing tetap leveraged.'},
+obds:{k:'FOUNDATION · semantic core',h:'OBDS mengelola lima kedalaman data: <b>Source → Raw → Canonical → Master → Knowledge</b>.<ul><li>Canonical taxonomy menyamakan makna.</li><li>MDM membentuk golden record.</li><li>Semantic layer menyimpan konteks dan relasi.</li><li>Governance menjamin owner, quality, lineage, dan security.</li></ul>'},
+knows:{k:'INTELLIGENCE · knowledge path',h:'Jalur pengetahuan menggabungkan <b>warehouse</b> untuk data terstruktur, <b>vector database</b> untuk pencarian semantik, dan <b>knowledge graph</b> untuk relasi antar entitas.'},
+does:{k:'INTELLIGENCE · capability path',h:'Jalur kapabilitas menyediakan feature store, model prediktif, agents, dan skills agar AI tidak hanya menjawab, tetapi mampu menjalankan workflow yang diizinkan.'},
+rag:{k:'INTELLIGENCE · grounded retrieval',h:'RAG mengambil konteks dari sumber yang benar sebelum LLM menjawab. Output harus memiliki citation, timestamp, dan batasan penggunaan.'},
+tools:{k:'INTELLIGENCE · governance by design',h:'Guardrails mencakup row-level security, policy, tool permission, audit log, citation, confidence, serta <b>human-in-the-loop</b> untuk keputusan kritis.'},
+gateway:{k:'INTELLIGENCE · controlled access',h:'Gateway menjadi satu pintu untuk model, prompt, routing, logging, observability, token control, dan evaluasi kualitas.'},
+apps:{k:'ACTION · consumption',h:'Konsumsi dapat berupa safety copilot, investigation assistant, executive briefing, predictive monitoring, agent pelacak corrective action, serta dashboard operasional.'},
+m0:{k:'ROADMAP · L0',h:'Data tersedia namun terfragmentasi, definisi tidak seragam, dan rekonsiliasi masih manual.'},
+m1:{k:'ROADMAP · L1',h:'Bangun inventory, data catalog, domain owner, steward, registry, serta klasifikasi data.'},
+m2:{k:'ROADMAP · L2',h:'Target MVP: canonical model, golden record, data quality rule, lineage, dan integrasi domain prioritas.'},
+m3:{k:'ROADMAP · L3',h:'Data dan model dapat direproduksi, memiliki versi, evaluasi, monitoring, dan reusable feature.'},
+m4:{k:'ROADMAP · L4',h:'LLM, predictive analytics, dan agentic workflow dijalankan secara governed berdasarkan fondasi L0–L3.'},
+auto:{k:'ROADMAP · process transformation',h:'BPM memperbaiki proses, RPA mengotomasi rule, dan AI menambah kemampuan reasoning/prediction. Ketiganya harus disatukan, bukan berjalan sendiri-sendiri.'},
+ipa:{k:'ROADMAP · intelligent process automation',h:'IPA menggabungkan workflow, rules, data, AI, dan human approval menjadi proses cerdas end-to-end.'},
+agentic:{k:'ROADMAP · agentic',h:'Agentic bekerja berdasarkan tujuan, konteks, tools, dan batas kewenangan. Untuk safety, tindakan berisiko tinggi tetap membutuhkan persetujuan manusia.'},
+support:{k:'GOVERNANCE · enabler lintas sistem',h:'<ul><li>Sponsorship dan mandat governance</li><li>Data Owner dan Steward per domain</li><li>Akses schema dan dukungan IT/CATALYST</li><li>Scope, anggaran, serta success criteria MVP</li><li>Workshop validasi dengan user operasional</li></ul>'}
+};
+
+function center(n){return{x:n.x+n.w/2,y:n.y+n.h/2}}
+function anchor(n,tx,ty){const cx=n.x+n.w/2,cy=n.y+n.h/2,dx=tx-cx,dy=ty-cy;if(!dx&&!dy)return{x:cx,y:cy};const s=1/Math.max(Math.abs(dx)/(n.w/2),Math.abs(dy)/(n.h/2));return{x:cx+dx*s,y:cy+dy*s}}
+const byId=Object.fromEntries(NODES.map(n=>[n.id,n]));let sparkId=0;
+function nodeHTML(n){
+  const chips=n.chips?`<div class="chips">${n.chips.map(x=>`<span class="chip">${x}</span>`).join('')}</div>`:'';
+  const stack=n.stack?`<div class="stack">${n.stack.map(x=>`<span><b>${x[0]}</b><em>${x[1]}</em></span>`).join('')}</div>`:'';
+  return `<foreignObject x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}"><button class="gnode${n.big?' big':''}" data-node="${n.id}" data-groups="${n.g}" style="--nc:${css(n.c)}"><span class="bar"></span><span class="body"><span class="lab">${n.lab}</span><span class="tag">${n.tag}</span>${chips}${stack}</span><span class="plus">+</span></button></foreignObject>`;
+}
+function edgeHTML(e){
+ const [a,b,c,g,dash]=e,A=byId[a],B=byId[b],ca=center(A),cb=center(B),p1=anchor(A,cb.x,cb.y),p2=anchor(B,ca.x,ca.y),dx=p2.x-p1.x,dy=p2.y-p1.y,len=Math.hypot(dx,dy)||1,mx=(p1.x+p2.x)/2,my=(p1.y+p2.y)/2,off=Math.min(28,len*.08),cx=mx-dy/len*off,cy=my+dx/len*off,d=`M${p1.x.toFixed(1)},${p1.y.toFixed(1)} Q${cx.toFixed(1)},${cy.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`,id='e'+sparkId++,col=css(c);
+ return {paths:`<path d="${d}" class="edgeBase edgeEl" data-groups="${g}"></path><path id="${id}" d="${d}" class="edgeFlow edgeEl${dash?' dashed':''}" data-groups="${g}" style="color:${col};stroke:${col}"></path>`,spark:`<circle r="3.8" fill="${col}" class="spark edgeEl" data-groups="${g}"><animateMotion dur="${(1.6+len/700).toFixed(2)}s" repeatCount="indefinite"><mpath href="#${id}"/></animateMotion></circle>`};
+}
+function render(){
+ let paths='',sparks='';EDGES.forEach(e=>{const h=edgeHTML(e);paths+=h.paths;sparks+=h.spark});
+ const zones=`
+ <rect class="zone" x="15" y="22" width="1610" height="170" rx="14"/><text class="zoneTitle" x="34" y="47">01 · WHY & OUTCOME</text>
+ <rect class="zone alt" x="15" y="205" width="1610" height="390" rx="14"/><text class="zoneTitle" x="34" y="232">02 · DATA → KNOWLEDGE → ACTION</text>
+ <rect class="zone" x="15" y="620" width="1610" height="330" rx="14"/><text class="zoneTitle" x="34" y="647">03 · TRANSFORMATION ROADMAP</text>
+ <rect class="zone alt" x="15" y="972" width="1610" height="120" rx="14"/><text class="zoneTitle" x="34" y="995">04 · CROSS-CUTTING GOVERNANCE</text>
+ <text class="phaseTitle" x="52" y="270">SYSTEM OF RECORD</text><text class="phaseTitle" x="315" y="270">EXISTING PLATFORM</text><text class="phaseTitle" x="565" y="220">SEMANTIC FOUNDATION</text><text class="phaseTitle" x="910" y="210">KNOWLEDGE & CAPABILITY</text><text class="phaseTitle" x="1180" y="225">GOVERNED INTELLIGENCE</text><text class="phaseTitle" x="1380" y="285">CONSUMPTION</text>`;
+ document.getElementById('canvas').innerHTML=`<svg class="board" viewBox="0 0 1640 1110" xmlns="http://www.w3.org/2000/svg"><g>${zones}</g><g>${paths}</g><g>${sparks}</g><g>${NODES.map(nodeHTML).join('')}</g></svg>`;
+ document.querySelectorAll('[data-node]').forEach(b=>b.addEventListener('click',()=>openDetail(b.dataset.node)));
+}
+
+function focusGroup(group){
+ document.querySelectorAll('#toolbar button').forEach(b=>b.classList.toggle('on',b.dataset.focus===group));
+ document.querySelectorAll('.gnode').forEach(el=>{const ok=group==='all'||el.dataset.groups.split(' ').includes(group);el.classList.toggle('dim',!ok)});
+ document.querySelectorAll('.edgeEl').forEach(el=>{const ok=group==='all'||el.dataset.groups.split(' ').includes(group);el.classList.toggle('edgeDim',!ok)});
+}
+document.querySelectorAll('#toolbar button').forEach(b=>b.onclick=()=>focusGroup(b.dataset.focus));
+
+const drawer=document.getElementById('drawer'),scrim=document.getElementById('scrim');
+function openDetail(id){const n=byId[id],d=DETAIL[id];if(!n||!d)return;document.getElementById('ddot').style.setProperty('--dc',css(n.c));document.getElementById('dtitle').textContent=n.lab;document.getElementById('dkey').textContent=d.k;document.getElementById('dbody').innerHTML=d.h;drawer.classList.add('on');scrim.classList.add('on')}
+function closeDetail(){drawer.classList.remove('on');scrim.classList.remove('on')}
+document.getElementById('close').onclick=closeDetail;scrim.onclick=closeDetail;window.addEventListener('keydown',e=>{if(e.key==='Escape')closeDetail()});
+render();
+</script>
+</body>
+</html>
